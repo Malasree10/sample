@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="84eb5763-e269-4173-8f34-d32048146fd0" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="cacheFlow" doc:id="f38d1973-e7bf-4604-b590-0bac9ba998ec" >
+		<http:listener doc:name="Listener" doc:id="91a4e282-124b-40d8-b65e-9214fae8522f" config-ref="HTTP_Listener_config" path="/"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1c6ff35b-dbdc-45ed-8289-8296adb851c0" message="started"/>
+		<ee:cache doc:name="Cache" doc:id="ebf0796c-f844-4f41-ab0f-8cb9270d56eb">
+			<logger level="INFO" doc:name="Logger" doc:id="26223eca-6887-4866-856d-30cfd541bd60" message="before flow"/>
+			<flow-ref doc:name="Flow Reference" doc:id="7f01ddc2-74aa-46f9-9927-8d6eb3f6c8fb" name="cacheSub_Flow"/>
+<!-- [STUDIO:"Transform Message"]			<ee:transform doc:name="Transform Message" doc:id="e775b9ee-7776-4464-963c-8da62df22cf6">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	"id":payload.id,
+	"name":payload.name
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform> [STUDIO] -->
+			<ee:transform doc:name="Transform Message" doc:id="b5dc2b06-5669-4522-be1c-7c05b6844062" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="3562c13c-ac8c-4d73-9210-18fd1a317904" message="after flow"/>
+		</ee:cache>
+		<logger level="INFO" doc:name="Logger" doc:id="2fd0dd9f-25a2-4c82-ad13-ba8fd8dcab2c" message="ended"/>
+	</flow>
+	<sub-flow name="cacheSub_Flow" doc:id="c41f535d-92e9-496f-b8ae-8722ebddb90d" >
+		<ee:transform doc:name="Transform Message" doc:id="9c2fd423-5b13-4601-b099-a3f2741fffaf" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="a" ><![CDATA[%dw 2.0
+output application/json
+---
+20]]></ee:set-variable>
+				<ee:set-variable variableName="b" ><![CDATA[%dw 2.0
+output application/json
+---
+20]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2bb03bd2-3796-406c-9b9a-2f9aceb6099b" message="in the flow"/>
+	</sub-flow>
+</mule>
